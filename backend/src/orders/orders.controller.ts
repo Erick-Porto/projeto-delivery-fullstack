@@ -6,10 +6,12 @@ import {
   Body,
   Param,
   Inject,
+  UseGuards,
 } from '@nestjs/common';
 import { OrdersService } from './orders.service';
 import { ClientProxy, EventPattern, Payload } from '@nestjs/microservices';
 import { CreateOrderDto } from './dto/create-order.dto';
+import { AuthGuard } from '@nestjs/passport';
 
 @Controller('orders')
 export class OrdersController {
@@ -34,11 +36,13 @@ export class OrdersController {
     console.log(`3. SUCESSO: Pedido salvo com ID:`, savedOrder);
   }
 
+  @UseGuards(AuthGuard('jwt')) // <--- O Cadeado Mágico
   @Get()
   findAll() {
     return this.ordersService.findAll();
   }
 
+  @UseGuards(AuthGuard('jwt'))
   @Patch(':id/status')
   updateStatus(@Param('id') id: string, @Body('status') status: string) {
     console.log(`Atualizando pedido ${id} para ${status}`);

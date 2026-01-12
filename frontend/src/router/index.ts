@@ -6,6 +6,7 @@ import {
   createWebHistory,
 } from 'vue-router';
 import routes from './routes';
+import { useAuthStore } from 'src/stores/auth-store';
 
 /*
  * If not building with SSR mode, you can
@@ -26,11 +27,18 @@ export default defineRouter(function (/* { store, ssrContext } */) {
   const Router = createRouter({
     scrollBehavior: () => ({ left: 0, top: 0 }),
     routes,
-
-    // Leave this as is and make changes in quasar.conf.js instead!
-    // quasar.conf.js -> build -> vueRouterMode
-    // quasar.conf.js -> build -> publicPath
     history: createHistory(process.env.VUE_ROUTER_BASE),
+  });
+
+  Router.beforeEach((to, from, next) => {
+    const authStore = useAuthStore();
+
+    // Se a rota precisa de autenticação E o usuário não está logado
+    if (to.meta.requiresAuth && !authStore.isAuthenticated) {
+      next('/login'); // Manda para o login
+    } else {
+      next(); // Pode passar
+    }
   });
 
   return Router;

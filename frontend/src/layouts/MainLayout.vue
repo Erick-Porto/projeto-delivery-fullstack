@@ -52,6 +52,16 @@
             :disable="cartStore.totalItems === 0"
             @click="checkout"
           />
+          <q-tooltip>Sair do Sistema</q-tooltip>
+          <q-btn
+            v-if="authStore.isAuthenticated"
+            flat
+            round
+            icon="logout"
+            color="white"
+            @click="handleLogout"
+          >
+          </q-btn>
         </div>
       </div>
     </q-drawer>
@@ -61,11 +71,15 @@
 <script setup lang="ts">
 import { ref } from 'vue';
 import { useCartStore } from 'src/stores/cart-store';
+import { useAuthStore } from 'src/stores/auth-store';
+import { useRouter } from 'vue-router';
 import { api } from 'boot/axios';
 import { useQuasar } from 'quasar';
 
 const $q = useQuasar();
+const router = useRouter();
 const cartStore = useCartStore();
+const authStore = useAuthStore();
 const rightDrawerOpen = ref(false);
 
 function toggleRightDrawer() {
@@ -93,4 +107,11 @@ async function checkout() {
     console.error(error);
   }
 }
+
+const handleLogout = async () => {
+  authStore.logout(); // Limpa o token e o localStorage
+  await router.push('/login'); // Redireciona para o login
+  // Opcional: fechar a gaveta se estiver aberta
+  rightDrawerOpen.value = false;
+};
 </script>
