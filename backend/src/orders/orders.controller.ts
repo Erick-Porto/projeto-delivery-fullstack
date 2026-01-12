@@ -1,5 +1,13 @@
-import { Controller, Post, Body, Inject } from '@nestjs/common';
-import { OrdersService } from './orders.service'; // Importe o Service
+import {
+  Controller,
+  Post,
+  Get,
+  Patch,
+  Body,
+  Param,
+  Inject,
+} from '@nestjs/common';
+import { OrdersService } from './orders.service';
 import { ClientProxy, EventPattern, Payload } from '@nestjs/microservices';
 import { CreateOrderDto } from './dto/create-order.dto';
 
@@ -24,5 +32,16 @@ export class OrdersController {
     const savedOrder = await this.ordersService.create(data);
 
     console.log(`3. SUCESSO: Pedido salvo com ID:`, savedOrder);
+  }
+
+  @Get()
+  findAll() {
+    return this.ordersService.findAll();
+  }
+
+  @Patch(':id/status')
+  updateStatus(@Param('id') id: string, @Body('status') status: string) {
+    console.log(`Atualizando pedido ${id} para ${status}`);
+    return this.ordersService.updateStatus(id, status);
   }
 }
